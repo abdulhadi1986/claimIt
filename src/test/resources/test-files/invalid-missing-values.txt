@@ -1,0 +1,13 @@
+ItemName: Laptop
+Quantity: 1
+Place: Taxi
+ItemName: Laptop
+Quantity: 1
+------------------------------------
+ItemName: Headphones
+Quantity: 2
+Place: Railway station
+-------------------------------------
+randomText: 23
+ItemName: Headphones
+Place: Railway statio
