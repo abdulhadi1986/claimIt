@@ -13,8 +13,9 @@ import java.nio.file.Path;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.foundIt.claimIt.domain.model.ItemEntity;
+import com.foundIt.claimIt.domain.entity.ItemEntity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ItemParsingServiceTest {
@@ -55,7 +56,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading valid TXT file return successful response")
+    @DisplayName("Test: When uploading valid TXT file with shuffled order return successful response")
     void parseLostAndFoundItems_TXT_success() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + VALID_TEXT_FILE);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ VALID_TEXT_FILE);
@@ -68,7 +69,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading invalid TXT file return error")
+    @DisplayName("Test: When uploading missing values TXT file return error")
     void parseLostAndFoundItems_TXT_error() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_1);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_1);
@@ -78,7 +79,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading invalid TXT file return error")
+    @DisplayName("Test: When uploading invalid characters TXT file return error")
     void parseLostAndFoundItems_TXT_error_2() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_2);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_2);
@@ -95,6 +96,19 @@ class ItemParsingServiceTest {
         MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_EXTENSION, "application/xml");
 
         assertThrows(IllegalArgumentException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
+    }
+
+    @Test
+    @DisplayName("Test: When uploading invalid contents TXT file return error")
+    void parseLostAndFoundItems_TXT_error_3() throws Exception {
+        java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + "empty.txt");
+        if (resource == null) throw new IllegalArgumentException("Resource not found: "+ "empty.txt");
+        MultipartFile multipartFile = getMultipartFile(resource, "empty.txt", "text/plain");
+
+        List<ItemEntity> items = itemParsingService.parseLostAndFoundItems(multipartFile);
+
+        assertNotNull(items, "Parsed items should not be null");
+        assertThat(items).isEmpty();
     }
 
     private static MultipartFile getMultipartFile(URL resource, String fileName, String fileType) throws URISyntaxException, IOException {

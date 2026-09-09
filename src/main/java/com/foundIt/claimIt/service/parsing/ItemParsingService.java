@@ -1,6 +1,6 @@
 package com.foundIt.claimIt.service.parsing;
 
-import com.foundIt.claimIt.domain.model.ItemEntity;
+import com.foundIt.claimIt.domain.entity.ItemEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
