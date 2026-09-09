@@ -1,7 +1,9 @@
 package com.foundIt.claimIt.service.parsing;
 
 import com.foundIt.claimIt.domain.entity.ItemEntity;
+import com.foundIt.claimIt.exception.InvalidUserInputException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemParsingService {
@@ -23,6 +26,7 @@ public class ItemParsingService {
             String extractedText = textExtractor.extractText(file);
             return extractItems(extractedText);
         } catch (IOException e) {
+            log.error("IOException while parsing file [{}]", e.getMessage(), e);
             throw new RuntimeException("Failed to process the uploaded file", e);
         }
     }
@@ -57,7 +61,8 @@ public class ItemParsingService {
                         }
                         continue;
                     } else {
-                        throw new RuntimeException("Missing ItemName");
+                        log.error("Error while parsing uploaded file: Missing ItemName data in one of the entries");
+                        throw new InvalidUserInputException("Missing ItemName data in one of the entries");
                     }
                 }
                 current = new ItemEntity();
@@ -77,7 +82,8 @@ public class ItemParsingService {
                         }
                         continue;
                     } else {
-                        throw new RuntimeException("Missing Quantity");
+                        log.error("Error while parsing uploaded file: Missing Quantity data in one of the entries");
+                        throw new InvalidUserInputException("Missing Quantity data in one of the entries");
                     }
                 }
                 current = new ItemEntity();
@@ -97,7 +103,8 @@ public class ItemParsingService {
                         }
                         continue;
                     } else {
-                        throw new RuntimeException("Missing Place");
+                        log.error("Error while parsing uploaded file: Missing Place data in one of the entries");
+                        throw new RuntimeException("Missing Place data in one of the entries");
                     }
                 }
                 current = new ItemEntity();

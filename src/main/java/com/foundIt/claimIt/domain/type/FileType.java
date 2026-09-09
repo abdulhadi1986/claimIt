@@ -1,5 +1,6 @@
 package com.foundIt.claimIt.domain.type;
 
+import com.foundIt.claimIt.exception.InvalidUserInputException;
 import org.apache.commons.lang3.StringUtils;
 
 public enum FileType {
@@ -23,6 +24,7 @@ public enum FileType {
                 return fileType;
             }
         }
-        throw new IllegalArgumentException("FileType is not supported: " + fileExtension);
+        throw new InvalidUserInputException(String.format(
+                "%s FileType is not supported. Only (.pdf, .docx and .txt) are allowed", fileExtension));
     }
 }

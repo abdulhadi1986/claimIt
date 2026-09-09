@@ -1,5 +1,6 @@
 package com.foundIt.claimIt.service.parsing;
 
+import com.foundIt.claimIt.exception.InvalidUserInputException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -75,7 +76,7 @@ class ItemParsingServiceTest {
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_1);
         MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_CONTENT_1, "text/plain");
 
-        assertThrows(RuntimeException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
+        assertThrows(InvalidUserInputException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
     }
 
     @Test
@@ -85,7 +86,7 @@ class ItemParsingServiceTest {
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_2);
         MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_CONTENT_2, "text/plain");
 
-        assertThrows(RuntimeException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
+        assertThrows(InvalidUserInputException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
     }
 
     @Test
@@ -95,7 +96,7 @@ class ItemParsingServiceTest {
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_EXTENSION);
         MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_EXTENSION, "application/xml");
 
-        assertThrows(IllegalArgumentException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
+        assertThrows(InvalidUserInputException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
     }
 
     @Test
@@ -111,7 +112,7 @@ class ItemParsingServiceTest {
         assertThat(items).isEmpty();
     }
 
-    private static MultipartFile getMultipartFile(URL resource, String fileName, String fileType) throws URISyntaxException, IOException {
+    private MultipartFile getMultipartFile(URL resource, String fileName, String fileType) throws URISyntaxException, IOException {
         Path path = Path.of(resource.toURI());
         byte[] content = Files.readAllBytes(path);
         return new MockMultipartFile(fileName, fileName, fileType, content);
