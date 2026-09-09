@@ -1,0 +1,11 @@
+Quantity: 1
+ItemName: Laptop
+Place: Taxi
+----------------------------
+Place: Railway station
+ItemName: Headphones
+Quantity: 2
+----------------------------
+ItemName: Mobile Phone
+Place: Airport
+Quantity: 3

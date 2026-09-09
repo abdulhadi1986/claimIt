@@ -1,0 +1,8 @@
+ItemName: ##@@####$$
+Quantity: 1
+Place: Railway station
+------------------------------------
+ItemName: ////////////
+Quantity: 2
+Place: Railway station
+-----------------------------------
