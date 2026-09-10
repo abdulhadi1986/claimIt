@@ -6,17 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item {
-    @JsonProperty("itemId")
-    private Long id;
-    @JsonProperty("description")
-    private String name;
-    @JsonProperty("foundAt")
-    private String place;
-    @JsonProperty("quantity")
-    private Long quantity;
+public class ItemResponse {
+    @JsonProperty("listAndFoundItems")
+    private List<Item> itemList;
 }

@@ -1,7 +1,9 @@
 package com.foundIt.claimIt.controller;
 
+import com.foundIt.claimIt.domain.model.ItemResponse;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
 import com.foundIt.claimIt.service.LostAndFoundItemsService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,32 +15,44 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ManagementControllerTest {
+class LostAndFoundControllerTest {
 
     @Mock
     private LostAndFoundItemsService lostAndFoundItemsService;
 
     @InjectMocks
-    ManagementController managementController;
+    LostAndFoundController lostAndFoundController;
 
     @Test
+    @DisplayName("UT: Upload file API successful response")
     void uploadValidFile_success() {
         when(lostAndFoundItemsService.processUploadedLostAndFoundItems(any())).thenReturn(List.of());
-        var response = managementController.uploadFile(getSampleFile());
+        var response = lostAndFoundController.uploadFile(getSampleFile());
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
     }
 
     @Test
+    @DisplayName("UT: Upload file API 400 Error")
     void uploadValidFile_400_Exception() {
         when(lostAndFoundItemsService.processUploadedLostAndFoundItems(any())).thenThrow(
                 new InvalidUserInputException("Invalid Input"));
-        assertThrows(InvalidUserInputException.class, () ->managementController.uploadFile(getSampleFile()));
+        assertThrows(InvalidUserInputException.class, () -> lostAndFoundController.uploadFile(getSampleFile()));
+    }
+
+    @Test
+    @DisplayName("UT: Get all items successful response")
+    void getLostAndFoundItems_success() {
+        when(lostAndFoundItemsService.getAllLostAndFoundItems()).thenReturn(List.of());
+        var response = lostAndFoundController.getLostItems();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).isEqualTo(ItemResponse.builder().itemList(List.of()).build());
     }
 
     private MultipartFile getSampleFile() {

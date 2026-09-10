@@ -32,4 +32,8 @@ public class StorageManagementService {
         }
         itemRepository.saveAll(itemEntityList);
     }
+
+    public List<ItemEntity> getAllItemsFromDB() {
+        return itemRepository.findAll();
+    }
 }

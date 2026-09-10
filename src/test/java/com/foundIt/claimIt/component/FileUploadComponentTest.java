@@ -1,14 +1,24 @@
 package com.foundIt.claimIt.component;
 
+import com.foundIt.claimIt.repository.ItemRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static io.restassured.RestAssured.given;
 
-@SpringJUnitConfig(initializers = ConfigDataApplicationContextInitializer.class)
+@SpringBootTest
 class FileUploadComponentTest {
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @BeforeEach
+    void setup() {
+        itemRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("CT: when uploading valid file get successful response")
@@ -17,7 +27,7 @@ class FileUploadComponentTest {
                 .expect()
                 .statusCode(202)
                 .when()
-                .post("http://localhost:8080/management/found-items-uploads")
+                .post("http://localhost:8080/claimit/management/found-items-uploads")
                 .then();
     }
 
@@ -28,7 +38,7 @@ class FileUploadComponentTest {
                 .expect()
                 .statusCode(400)
                 .when()
-                .post("http://localhost:8080/management/found-items-uploads");
+                .post("http://localhost:8080/claimit/management/found-items-uploads");
     }
 
     private String getValidContent() {

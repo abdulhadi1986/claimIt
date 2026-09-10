@@ -3,6 +3,7 @@ package com.foundIt.claimIt.service;
 import com.foundIt.claimIt.domain.entity.ItemEntity;
 import com.foundIt.claimIt.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,7 @@ class StorageManagementServiceTest {
     }
 
     @Test
+    @DisplayName("UT: saving items to DB, update qty of existing items where name and place are similar")
     void saveLostAndFoundItemsToDB_updateExistingRecords() {
         assertThat(itemRepository.findAll()).isEmpty();
         ItemEntity itemEntity1 = new ItemEntity();
@@ -63,6 +65,7 @@ class StorageManagementServiceTest {
     }
 
     @Test
+    @DisplayName("UT: when saving items to DB successful scenario")
     void saveLostAndFoundItemsToDB_NoExistingRecords() {
         assertThat(itemRepository.findAll()).hasSize(0);
 

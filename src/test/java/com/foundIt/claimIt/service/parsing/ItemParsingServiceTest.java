@@ -32,7 +32,7 @@ class ItemParsingServiceTest {
     private final ItemParsingService itemParsingService = constructService();
 
     @Test
-    @DisplayName("Test: When uploading valid PDF file return successful response")
+    @DisplayName("UT: When uploading valid PDF file return successful response")
     void parseLostAndFoundItems_PDF_success() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + VALID_PDF_FILE);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ VALID_PDF_FILE);
@@ -45,7 +45,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading valid WORD file return successful response")
+    @DisplayName("UT: When uploading valid WORD file return successful response")
     void parseLostAndFoundItems_WORD_success() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + VALID_WORD_FILE);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ VALID_WORD_FILE);
@@ -58,7 +58,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading valid TXT file with shuffled order return successful response")
+    @DisplayName("UT: When uploading valid TXT file with shuffled order return successful response")
     void parseLostAndFoundItems_TXT_success() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + VALID_TEXT_FILE);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ VALID_TEXT_FILE);
@@ -71,7 +71,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading missing values at the top TXT file return error")
+    @DisplayName("UT: When uploading missing values at the top TXT file return error")
     void parseLostAndFoundItems_TXT_error_missing_value_top() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_1);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_1);
@@ -81,7 +81,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading missing values at the bottom TXT file return error")
+    @DisplayName("UT: When uploading missing values at the bottom TXT file return error")
     void parseLostAndFoundItems_TXT_error_missing_value_bottom() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_3);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_3);
@@ -91,7 +91,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading invalid characters TXT file return error")
+    @DisplayName("UT: When uploading invalid characters TXT file return error")
     void parseLostAndFoundItems_TXT_error_invalid_chars() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_2);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_2);
@@ -101,7 +101,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading unsupported file type return error")
+    @DisplayName("UT: When uploading unsupported file type return error")
     void parseLostAndFoundItems_XML_error() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_EXTENSION);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_EXTENSION);
@@ -111,7 +111,7 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading invalid contents TXT file return error")
+    @DisplayName("UT: When uploading invalid contents TXT file return error")
     void parseLostAndFoundItems_TXT_error_3() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + "empty.txt");
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ "empty.txt");

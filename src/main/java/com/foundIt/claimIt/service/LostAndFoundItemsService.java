@@ -31,4 +31,13 @@ public class LostAndFoundItemsService {
         storageManagementService.saveLostAndFoundItemsToDB(entityList);
         return entityList.stream().map(DomainMapper.mapper()::mapToItem).toList();
     }
+
+    public List<Item> getAllLostAndFoundItems() {
+        List<ItemEntity> itemEntityList = storageManagementService.getAllItemsFromDB();
+        if (itemEntityList == null || itemEntityList.isEmpty()) {
+            log.warn("No Items found in the Database");
+            return List.of();
+        }
+        return itemEntityList.stream().map(DomainMapper.mapper()::mapToItem).toList();
+    }
 }
