@@ -26,6 +26,7 @@ class ItemParsingServiceTest {
     private static final String VALID_TEXT_FILE = "valid.txt";
     private static final String INVALID_FILE_CONTENT_1 = "invalid-missing-values.txt";
     private static final String INVALID_FILE_CONTENT_2 = "invalid-missing-strange-chars.txt";
+    private static final String INVALID_FILE_CONTENT_3 = "invalid-missing-values-bottom.txt";
     private static final String INVALID_FILE_EXTENSION = "invalid-extension.xml";
 
     private final ItemParsingService itemParsingService = constructService();
@@ -70,8 +71,8 @@ class ItemParsingServiceTest {
     }
 
     @Test
-    @DisplayName("Test: When uploading missing values TXT file return error")
-    void parseLostAndFoundItems_TXT_error() throws Exception {
+    @DisplayName("Test: When uploading missing values at the top TXT file return error")
+    void parseLostAndFoundItems_TXT_error_missing_value_top() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_1);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_1);
         MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_CONTENT_1, "text/plain");
@@ -80,8 +81,18 @@ class ItemParsingServiceTest {
     }
 
     @Test
+    @DisplayName("Test: When uploading missing values at the bottom TXT file return error")
+    void parseLostAndFoundItems_TXT_error_missing_value_bottom() throws Exception {
+        java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_3);
+        if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_3);
+        MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_CONTENT_3, "text/plain");
+
+        assertThrows(InvalidUserInputException.class, ()-> itemParsingService.parseLostAndFoundItems(multipartFile));
+    }
+
+    @Test
     @DisplayName("Test: When uploading invalid characters TXT file return error")
-    void parseLostAndFoundItems_TXT_error_2() throws Exception {
+    void parseLostAndFoundItems_TXT_error_invalid_chars() throws Exception {
         java.net.URL resource = getClass().getClassLoader().getResource(TEST_FILES_PATH + INVALID_FILE_CONTENT_2);
         if (resource == null) throw new IllegalArgumentException("Resource not found: "+ INVALID_FILE_CONTENT_2);
         MultipartFile multipartFile = getMultipartFile(resource, INVALID_FILE_CONTENT_2, "text/plain");

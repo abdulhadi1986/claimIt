@@ -10,4 +10,3 @@ Place: Railway station
 -------------------------------------
 randomText: 23
 ItemName: Headphones
-Place: Railway station

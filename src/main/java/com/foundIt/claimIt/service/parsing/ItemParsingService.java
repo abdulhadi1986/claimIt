@@ -31,20 +31,34 @@ public class ItemParsingService {
         }
     }
 
+    /**
+     * Parses the given text and maps it into ItemEntity object.
+     * The process is order agnostic which means that contents order doesn't matter
+     * These 3 contents will result in the same object :
+     * | ItemName: phone    | Quantity: 3       | Place: station
+     * | Quantity: 3        | ItemName: phone   | Quantity: 3
+     * | Place: station     | Place: station    | ItemName: phone
+     * -----------------------------------------------------------
+     * Values that don't represent this data will be ignored
+     * @param text
+     * @return List<ItemEntity>
+     * @throws InvalidUserInputException when one of the 3 properties is missing
+     */
     private List<ItemEntity> extractItems(String text) {
         List<ItemEntity> items = new ArrayList<>();
         if (text == null || text.isBlank()) {
             return items;
         }
 
-        ItemEntity current = null;
+        ItemEntity currentItem = null;
         String[] lines = text.split("\\R");
 
         for (String rawLine : lines) {
-            if (current != null && current.getName() != null && current.getPlace() != null &&
-                current.getQuantity() != null) {
-                items.add(current);
-                current = null;
+            // If current ItemEntity is fully mapped then add it to the list and reset it.
+            if (currentItem != null && currentItem.getName() != null && currentItem.getPlace() != null &&
+                currentItem.getQuantity() != null) {
+                items.add(currentItem);
+                currentItem = null;
             }
 
             String line = rawLine.trim();
@@ -52,72 +66,83 @@ public class ItemParsingService {
                 continue;
             }
 
-            if (line.startsWith("ItemName:")) {
-                if (current != null) {
-                    if (current.getName() == null && (current.getPlace() != null || current.getQuantity() != null)) {
+            if (line.startsWith("ItemName:") || line.startsWith("itemName:")) {
+                //If current ItemEntity is initialized, it means we already iterated through the loop and some data is already filled
+                if (currentItem != null) {
+                    //Treat an ItemName line as the start of a new item record. but also
+                    //Allow a missing ItemName to be filled later ONLY when the item already contains other identifying data (Place or Quantity).
+                    if (currentItem.getName() == null && (currentItem.getPlace() != null || currentItem.getQuantity() != null)) {
                         String value = cleanValue(line.substring(line.indexOf(':') + 1).trim());
                         if (!value.isEmpty()) {
-                            current.setName(value);
+                            currentItem.setName(value);
                         }
                         continue;
                     } else {
-                        log.error("Error while parsing uploaded file: Missing ItemName data in one of the entries");
-                        throw new InvalidUserInputException("Missing ItemName data in one of the entries");
+                        //Reject the file if a new ItemName is encountered while the previous item is still in an inconsistent state.
+                        log.error("Error while parsing uploaded file: Missing Quantity OR Place data in one of the entries");
+                        throw new InvalidUserInputException("Missing Quantity OR Place data in one of the entries");
                     }
                 }
-                current = new ItemEntity();
+                //Otherwise, we start initializing new ItemEntity
+                currentItem = new ItemEntity();
                 String value = cleanValue(line.substring(line.indexOf(':') + 1).trim());
                 if (!value.isEmpty()) {
-                    current.setName(value);
+                    currentItem.setName(value);
                 }
                 continue;
             }
 
-            if (line.startsWith("Quantity:")) {
-                if (current != null) {
-                    if (current.getQuantity() == null && (current.getPlace() != null || current.getName() != null)) {
+            if (line.startsWith("Quantity:") || line.startsWith("quantity:")) {
+                if (currentItem != null) {
+                    if (currentItem.getQuantity() == null && (currentItem.getPlace() != null || currentItem.getName() != null)) {
                         String value = cleanValue(line.substring(line.indexOf(':') + 1).trim());
                         if (!value.isEmpty()) {
-                            current.setQuantity((long) parseQuantity(value));
+                            currentItem.setQuantity((long) parseQuantity(value));
                         }
                         continue;
                     } else {
-                        log.error("Error while parsing uploaded file: Missing Quantity data in one of the entries");
-                        throw new InvalidUserInputException("Missing Quantity data in one of the entries");
+                        log.error("Error while parsing uploaded file: Missing Name OR Place data in one of the entries");
+                        throw new InvalidUserInputException("Missing Name OR Place data in one of the entries");
                     }
                 }
-                current = new ItemEntity();
+                currentItem = new ItemEntity();
                 String value = cleanValue(line.substring(line.indexOf(':') + 1).trim());
                 if (!value.isEmpty()) {
-                    current.setQuantity((long) parseQuantity(value));
+                    currentItem.setQuantity((long) parseQuantity(value));
                 }
                 continue;
             }
 
-            if (line.startsWith("Place:")) {
-                if (current != null) {
-                    if (current.getPlace() == null && (current.getQuantity() != null || current.getName() != null)) {
+            if (line.startsWith("Place:") || line.startsWith("place:")) {
+                if (currentItem != null) {
+                    if (currentItem.getPlace() == null && (currentItem.getQuantity() != null || currentItem.getName() != null)) {
                         String value = cleanValue(line.substring(line.indexOf(':') + 1).trim());
                         if (!value.isEmpty()) {
-                            current.setPlace(value);
+                            currentItem.setPlace(value);
                         }
                         continue;
                     } else {
-                        log.error("Error while parsing uploaded file: Missing Place data in one of the entries");
-                        throw new RuntimeException("Missing Place data in one of the entries");
+                        log.error("Error while parsing uploaded file: Missing Name OR Quantity data in one of the entries");
+                        throw new InvalidUserInputException("Missing Name OR Quantity data in one of the entries");
                     }
                 }
-                current = new ItemEntity();
+                currentItem = new ItemEntity();
                 String value = cleanValue(line.substring(line.indexOf(':') + 1).trim());
                 if (!value.isEmpty()) {
-                    current.setPlace(value);
+                    currentItem.setPlace(value);
                 }
             }
         }
+        //Validate latest ItemEntity for consistency
+        if (currentItem != null && currentItem.getName() != null && currentItem.getQuantity() != null &&
+            currentItem.getPlace() != null) {
+            items.add(currentItem);
+        }
 
-        if (current != null && current.getName() != null && current.getQuantity() != null &&
-            current.getPlace() != null) {
-            items.add(current);
+        if(currentItem != null && (currentItem.getName() == null || currentItem.getQuantity() == null ||
+           currentItem.getPlace() == null)) {
+            log.error("Error while parsing uploaded file: Missing required data in one of the entries");
+            throw new InvalidUserInputException("Missing required data in one of the entries");
         }
 
         return items;

@@ -1,6 +1,13 @@
 spring:
   application:
     name: claimIt
+
+  # Set the max size for multipart file
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
   datasource:
     url: jdbc:postgresql://localhost:5432/claimify
     username: claimify

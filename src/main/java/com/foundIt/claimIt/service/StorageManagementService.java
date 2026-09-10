@@ -23,7 +23,7 @@ public class StorageManagementService {
                     itemRepository.findByNameAndPlace(itemEntity.getName(),itemEntity.getPlace());
             if (optionalExistingItem.isPresent()) {
                 var existingItem = optionalExistingItem.get();
-                log.info("Found [{}] similar record(s) in the DB. Updating quantity", existingItem.getQuantity());
+                log.info("Found [{}] similar item(s) in the DB. Updating quantity", existingItem.getQuantity());
                 itemEntity.setId(existingItem.getId());
                 itemEntity.setName(existingItem.getName());
                 itemEntity.setPlace(existingItem.getPlace());
