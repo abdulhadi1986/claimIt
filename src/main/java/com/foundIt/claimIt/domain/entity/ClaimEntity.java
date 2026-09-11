@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "claims")
@@ -33,7 +31,6 @@ public class ClaimEntity {
 
     @PrePersist
     protected void onCreate() {
-        Instant now = Instant.now();
-        this.createdAt = now;
+        this.createdAt = Instant.now();
     }
 }

@@ -30,7 +30,7 @@ public class ClaimsService {
     private final UserRepository userRepository;
     private final MockUserService userService;
 
-    public Long processClaimRequest(@NotNull String itemId, @NotNull Long qty) {
+    public Claim processClaimRequest(@NotNull String itemId, @NotNull Long qty) {
         //get user data from userService to get their data
         LocalUser userData = userService.getUserData(UUID.randomUUID().toString())
                 .orElseThrow(() -> new AuthenticationException("User not found error"));
@@ -47,7 +47,7 @@ public class ClaimsService {
             throw new InvalidUserInputException("Claimed quantity is more than the registered items available");
         }
 
-        return saveClaimToDB(qty, itemEntity, userData);
+        return DomainMapper.mapper().mapToClaim(saveClaimToDB(qty, itemEntity, userData));
     }
 
     public List<Claim> getSubmittedClaims() {
@@ -56,7 +56,7 @@ public class ClaimsService {
                 .toList();
     }
 
-    private Long saveClaimToDB(Long qty, ItemEntity itemEntity, LocalUser userData) {
+    private ClaimEntity saveClaimToDB(Long qty, ItemEntity itemEntity, LocalUser userData) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(userData.getUserId());
         userEntity.setUserName(userData.getUserName());
@@ -68,6 +68,6 @@ public class ClaimsService {
         claimEntity.setQuantity(qty);
         claimEntity.setItemEntity(itemEntity);
         claimEntity.setUserEntity(userEntity);
-        return claimRepository.save(claimEntity).getId();
+        return claimRepository.save(claimEntity);
     }
 }

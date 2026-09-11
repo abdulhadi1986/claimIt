@@ -7,15 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "ItemResponse", description = "Response containing the list of found items.")
-public class ItemResponse {
-    @JsonProperty("listAndFoundItems")
-    @Schema(description = "List of found items returned by the API", implementation = Item.class)
-    private List<Item> itemList;
+@Schema(name = "FileUploadResponse", description = "Response returned after a file upload is processed.")
+public class FileUploadResponse {
+    @JsonProperty("numberOfUploadedItems")
+    @Schema(description = "Number of items extracted from the uploaded file", example = "3")
+    private int numberOfItems;
 }
