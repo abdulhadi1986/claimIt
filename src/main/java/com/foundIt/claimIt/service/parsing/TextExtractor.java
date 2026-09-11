@@ -13,7 +13,10 @@ public interface TextExtractor {
      * Normalizes line breaks, Unicode spaces, smart quotes, and typographical dashes.
      */
     default String normalizeText(String text) {
-        if (text == null) return "";
+        if (text == null) {
+            return "";
+        }
+
         return text
                 .replace("\r\n", "\n")
                 .replace("\r", "\n")

@@ -1,7 +1,6 @@
-package com.foundIt.claimIt.service;
+package com.foundIt.claimIt.repository;
 
 import com.foundIt.claimIt.domain.entity.ItemEntity;
-import com.foundIt.claimIt.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,16 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-class StorageManagementServiceTest {
+class ItemRepositoryTest {
 
     @Autowired
     private ItemRepository itemRepository;
-
-    @Autowired
-    private StorageManagementService storageManagementService;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +50,7 @@ class StorageManagementServiceTest {
         itemEntity3.setPlace("Bus station");
         itemEntity3.setQuantity(2L);
 
-        storageManagementService.saveLostAndFoundItemsToDB(List.of(itemEntity2, itemEntity3));
+        itemRepository.saveLostAndFoundItemsToDB(List.of(itemEntity2, itemEntity3));
         assertThat(itemRepository.findAll()).hasSize(2);
         var updatedItem = itemRepository
                 .findByNameAndPlace("Iphone 13 pro-max", "Trian station")
@@ -62,13 +58,17 @@ class StorageManagementServiceTest {
         assertThat(updatedItem.getQuantity()).isEqualTo(4L);
         assertEquals(createdTimestamp, updatedItem.getCreatedAt());
         assertThat(updatedItem.getLastModifiedAt()).isAfter(updatedTimestamp);
+
+        var notUpdatedItem = itemRepository
+                .findByNameAndPlace("Laptop", "Bus station")
+                .orElseThrow();
+        assertThat(notUpdatedItem.getQuantity()).isEqualTo(2L);
     }
 
     @Test
     @DisplayName("UT: when saving items to DB successful scenario")
     void saveLostAndFoundItemsToDB_NoExistingRecords() {
         assertThat(itemRepository.findAll()).hasSize(0);
-
         ItemEntity itemEntity2 = new ItemEntity();
         itemEntity2.setName("Iphone 13 pro-max");
         itemEntity2.setPlace("Trian station");
@@ -79,6 +79,12 @@ class StorageManagementServiceTest {
         itemEntity3.setPlace("Bus station");
         itemEntity3.setQuantity(2L);
 
-        storageManagementService.saveLostAndFoundItemsToDB(List.of(itemEntity2, itemEntity3));
+        itemRepository.saveLostAndFoundItemsToDB(List.of(itemEntity2, itemEntity3));
+        assertThat(itemRepository.findAll()).hasSize(2);
+        var updatedItem = itemRepository
+                .findByNameAndPlace("Iphone 13 pro-max", "Trian station")
+                .orElseThrow();
+        assertThat(updatedItem.getQuantity()).isEqualTo(1L);
+        assertEquals(updatedItem.getLastModifiedAt(), updatedItem.getCreatedAt());
     }
 }

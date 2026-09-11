@@ -27,7 +27,7 @@ class FileUploadComponentTest {
                 .expect()
                 .statusCode(202)
                 .when()
-                .post("http://localhost:8080/claimit/management/found-items-uploads")
+                .post("http://localhost:8080/claimit/items-mgt/items-uploads")
                 .then();
     }
 
@@ -38,7 +38,7 @@ class FileUploadComponentTest {
                 .expect()
                 .statusCode(400)
                 .when()
-                .post("http://localhost:8080/claimit/management/found-items-uploads");
+                .post("http://localhost:8080/claimit/items-mgt/items-uploads");
     }
 
     private String getValidContent() {

@@ -3,6 +3,7 @@ package com.foundIt.claimIt.service;
 import com.foundIt.claimIt.domain.entity.ItemEntity;
 import com.foundIt.claimIt.domain.model.Item;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
+import com.foundIt.claimIt.repository.ItemRepository;
 import com.foundIt.claimIt.service.parsing.ItemParsingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,13 +25,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class LostAndFoundItemsServiceTest {
+class ItemsServiceTest {
     @Mock
     private ItemParsingService itemParsingService;
     @Mock
-    private StorageManagementService storageManagementService;
+    private ItemRepository itemRepository;
     @InjectMocks
-    private LostAndFoundItemsService lostAndFoundItemsService;
+    private ItemsService itemsService;
 
     @Test
     @DisplayName("UT: when processing uploaded file happy flow")
@@ -41,9 +42,9 @@ class LostAndFoundItemsServiceTest {
         itemEntity.setPlace("Train Station");
         when(itemParsingService.parseLostAndFoundItems(any())).thenReturn(List.of(itemEntity));
 
-        doNothing().when(storageManagementService).saveLostAndFoundItemsToDB(any());
+        doNothing().when(itemRepository).saveLostAndFoundItemsToDB(any());
 
-        var returnedResponse = lostAndFoundItemsService.processUploadedLostAndFoundItems(new MockMultipartFile("file-name.pdf", "file-contents".getBytes()));
+        var returnedResponse = itemsService.processUploadedLostAndFoundItems(new MockMultipartFile("file-name.pdf", "file-contents".getBytes()));
         assertNotNull(returnedResponse);
         assertThat(returnedResponse).hasSize(1);
         Item returnedITem = returnedResponse.getFirst();
@@ -51,14 +52,14 @@ class LostAndFoundItemsServiceTest {
         assertThat(returnedITem.getPlace()).isEqualTo(itemEntity.getPlace());
         assertThat(returnedITem.getId()).isEqualTo(itemEntity.getId());
 
-        verify(storageManagementService).saveLostAndFoundItemsToDB(List.of(itemEntity));
+        verify(itemRepository).saveLostAndFoundItemsToDB(List.of(itemEntity));
     }
 
     @Test
     @DisplayName("UT: when processing uploaded file returns empty item list throws exception")
     void processLostAndFoundItems_exception() {
         when(itemParsingService.parseLostAndFoundItems(any())).thenReturn(List.of());
-        assertThrows(InvalidUserInputException.class, ()-> lostAndFoundItemsService.processUploadedLostAndFoundItems(new MockMultipartFile("file-name.pdf", "file-contents".getBytes())));
-        verifyNoInteractions(storageManagementService);
+        assertThrows(InvalidUserInputException.class, ()-> itemsService.processUploadedLostAndFoundItems(new MockMultipartFile("file-name.pdf", "file-contents".getBytes())));
+        verifyNoInteractions(itemRepository);
     }
 }

@@ -2,7 +2,7 @@ package com.foundIt.claimIt.controller;
 
 import com.foundIt.claimIt.domain.model.ItemResponse;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
-import com.foundIt.claimIt.service.LostAndFoundItemsService;
+import com.foundIt.claimIt.service.ItemsService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,35 +22,35 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class LostAndFoundControllerTest {
+class ItemsControllerTest {
 
     @Mock
-    private LostAndFoundItemsService lostAndFoundItemsService;
+    private ItemsService itemsService;
 
     @InjectMocks
-    LostAndFoundController lostAndFoundController;
+    ItemsController itemsController;
 
     @Test
     @DisplayName("UT: Upload file API successful response")
     void uploadValidFile_success() {
-        when(lostAndFoundItemsService.processUploadedLostAndFoundItems(any())).thenReturn(List.of());
-        var response = lostAndFoundController.uploadFile(getSampleFile());
+        when(itemsService.processUploadedLostAndFoundItems(any())).thenReturn(List.of());
+        var response = itemsController.uploadFile(getSampleFile());
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
     }
 
     @Test
     @DisplayName("UT: Upload file API 400 Error")
     void uploadValidFile_400_Exception() {
-        when(lostAndFoundItemsService.processUploadedLostAndFoundItems(any())).thenThrow(
+        when(itemsService.processUploadedLostAndFoundItems(any())).thenThrow(
                 new InvalidUserInputException("Invalid Input"));
-        assertThrows(InvalidUserInputException.class, () -> lostAndFoundController.uploadFile(getSampleFile()));
+        assertThrows(InvalidUserInputException.class, () -> itemsController.uploadFile(getSampleFile()));
     }
 
     @Test
     @DisplayName("UT: Get all items successful response")
     void getLostAndFoundItems_success() {
-        when(lostAndFoundItemsService.getAllLostAndFoundItems()).thenReturn(List.of());
-        var response = lostAndFoundController.getLostItems();
+        when(itemsService.getAllLostAndFoundItems()).thenReturn(List.of());
+        var response = itemsController.getLostItems();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).isEqualTo(ItemResponse.builder().itemList(List.of()).build());
     }

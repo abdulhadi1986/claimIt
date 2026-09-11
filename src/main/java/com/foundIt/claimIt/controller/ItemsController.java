@@ -2,7 +2,7 @@ package com.foundIt.claimIt.controller;
 
 import com.foundIt.claimIt.domain.model.Item;
 import com.foundIt.claimIt.domain.model.ItemResponse;
-import com.foundIt.claimIt.service.LostAndFoundItemsService;
+import com.foundIt.claimIt.service.ItemsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -20,21 +20,21 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-public class LostAndFoundController {
-    private final LostAndFoundItemsService lostAndFoundItemsService;
+public class ItemsController {
+    private final ItemsService itemsService;
 
-    @PostMapping(value = "/claimit/management/found-items-uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/claimit/items-mgt/items-uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(@RequestPart("file") MultipartFile file) {
         log.info("Request received to upload lost items [{}]", file.getOriginalFilename());
-        List<Item> uploadedItems = lostAndFoundItemsService.processUploadedLostAndFoundItems(file);
+        List<Item> uploadedItems = itemsService.processUploadedLostAndFoundItems(file);
         log.info("Successfully uploaded [{}] lost items from file [{}]", uploadedItems.size(), file.getOriginalFilename());
         return ResponseEntity.status(202).body(uploadedItems.size() + " Items uploaded and processed successfully");
     }
 
-    @GetMapping("/claimit/items/lost-and-found-items")
+    @GetMapping(value = "/claimit/items/lost-and-found-items", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ItemResponse> getLostItems() {
         return ResponseEntity.ok(ItemResponse.builder()
-                .itemList(lostAndFoundItemsService.getAllLostAndFoundItems())
+                .itemList(itemsService.getAllLostAndFoundItems())
                 .build());
     }
 }

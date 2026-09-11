@@ -4,9 +4,25 @@ import com.foundIt.claimIt.domain.entity.ItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
+
     Optional<ItemEntity> findByNameAndPlace(String name, String place);
+
+    default void saveLostAndFoundItemsToDB(List<ItemEntity> entityList) {
+        for (ItemEntity itemEntity : entityList) {
+            Optional<ItemEntity> optionalExistingItem = findByNameAndPlace(itemEntity.getName(), itemEntity.getPlace());
+            if (optionalExistingItem.isPresent()) {
+                var existingItem = optionalExistingItem.get();
+                itemEntity.setId(existingItem.getId());
+                itemEntity.setName(existingItem.getName());
+                itemEntity.setPlace(existingItem.getPlace());
+                itemEntity.setQuantity(existingItem.getQuantity() + itemEntity.getQuantity());
+            }
+        }
+        saveAll(entityList);
+    }
 }

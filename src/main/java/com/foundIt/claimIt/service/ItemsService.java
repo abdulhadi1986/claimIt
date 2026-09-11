@@ -1,9 +1,10 @@
 package com.foundIt.claimIt.service;
 
-import com.foundIt.claimIt.domain.model.Item;
 import com.foundIt.claimIt.domain.entity.ItemEntity;
+import com.foundIt.claimIt.domain.model.Item;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
 import com.foundIt.claimIt.mapper.DomainMapper;
+import com.foundIt.claimIt.repository.ItemRepository;
 import com.foundIt.claimIt.service.parsing.ItemParsingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,10 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LostAndFoundItemsService {
+public class ItemsService {
 
     private final ItemParsingService itemParsingService;
-    private final StorageManagementService storageManagementService;
+    private final ItemRepository itemRepository;
 
     public List<Item> processUploadedLostAndFoundItems(MultipartFile uploadedLostAndFoundItemsFile) {
         List<ItemEntity> entityList = itemParsingService.parseLostAndFoundItems(uploadedLostAndFoundItemsFile);
@@ -28,13 +29,13 @@ public class LostAndFoundItemsService {
                                                 uploadedLostAndFoundItemsFile.getOriginalFilename());
         }
 
-        storageManagementService.saveLostAndFoundItemsToDB(entityList);
+        itemRepository.saveLostAndFoundItemsToDB(entityList);
         return entityList.stream().map(DomainMapper.mapper()::mapToItem).toList();
     }
 
     public List<Item> getAllLostAndFoundItems() {
-        List<ItemEntity> itemEntityList = storageManagementService.getAllItemsFromDB();
-        if (itemEntityList == null || itemEntityList.isEmpty()) {
+        List<ItemEntity> itemEntityList = itemRepository.findAll();
+        if (itemEntityList.isEmpty()) {
             log.warn("No Items found in the Database");
             return List.of();
         }
