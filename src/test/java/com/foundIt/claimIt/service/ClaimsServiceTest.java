@@ -3,6 +3,7 @@ package com.foundIt.claimIt.service;
 import com.foundIt.claimIt.domain.entity.ClaimEntity;
 import com.foundIt.claimIt.domain.entity.ItemEntity;
 import com.foundIt.claimIt.domain.entity.UserEntity;
+import com.foundIt.claimIt.domain.model.Claim;
 import com.foundIt.claimIt.exception.AuthenticationException;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
 import com.foundIt.claimIt.local.domain.LocalUser;
@@ -19,10 +20,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -56,11 +60,7 @@ class ClaimsServiceTest {
         LocalUser localUser = LocalUser.builder().userId(UUID.randomUUID().toString()).userName("user1@test.com").build();
         when(userService.getUserData(anyString())).thenReturn(
                 Optional.of(localUser));
-        ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setId(1986L);
-        itemEntity.setName("Laptop");
-        itemEntity.setQuantity(2L);
-        itemEntity.setPlace("Train Station");
+        ItemEntity itemEntity = getItemEntity(1986L, 2L);
 
         when(itemRepository.findById(1986L)).thenReturn(Optional.of(itemEntity));
         when(userRepository.existsById(anyString())).thenReturn(false);
@@ -115,11 +115,7 @@ class ClaimsServiceTest {
         LocalUser localUser = LocalUser.builder().userId(UUID.randomUUID().toString()).userName("user1@test.com").build();
         when(userService.getUserData(anyString())).thenReturn(
                 Optional.of(localUser));
-        ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setId(1986L);
-        itemEntity.setName("Laptop");
-        itemEntity.setQuantity(1L);
-        itemEntity.setPlace("Train Station");
+        ItemEntity itemEntity = getItemEntity(1986L, 1L);
 
         when(itemRepository.findById(1986L)).thenReturn(Optional.of(itemEntity));
         assertThrows(InvalidUserInputException.class, () ->claimsService.processClaimRequest("1986", 2L));
@@ -128,4 +124,34 @@ class ClaimsServiceTest {
         verifyNoInteractions(claimRepository);
     }
 
+    @Test
+    @DisplayName("UT: success when get all submitted claims")
+    void getClaims_success() {
+        ClaimEntity claimEntity1 = getClaimEntity(1L, 1L);
+        when(claimRepository.findAll()).thenReturn(List.of(claimEntity1));
+        List<Claim> returnedClaims = claimsService.getSubmittedClaims();
+        assertNotNull(returnedClaims);
+    }
+
+    private ClaimEntity getClaimEntity(Long id, Long qty) {
+        ClaimEntity claimEntity1 = new ClaimEntity();
+        claimEntity1.setId(id);
+        claimEntity1.setQuantity(qty);
+        claimEntity1.setItemEntity(getItemEntity(1L, 2L));
+        UserEntity userEntity1 = new UserEntity();
+        userEntity1.setId("100");
+        userEntity1.setUserName("userName1");
+        claimEntity1.setUserEntity(userEntity1);
+        claimEntity1.setCreatedAt(Instant.now());
+        return claimEntity1;
+    }
+
+    private ItemEntity getItemEntity(long id, long quantity) {
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setId(id);
+        itemEntity.setName("Laptop");
+        itemEntity.setQuantity(quantity);
+        itemEntity.setPlace("Train Station");
+        return itemEntity;
+    }
 }

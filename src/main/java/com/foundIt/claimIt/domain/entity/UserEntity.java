@@ -17,6 +17,7 @@ public class UserEntity {
     @NotEmpty
     private String id;
 
+    @Column(name = "userName")
     @NotEmpty(message = "Name is required")
     private String userName;
 

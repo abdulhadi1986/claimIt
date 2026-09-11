@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClaimRequest {
+public class SubmitClaimRequest {
     @NotNull
     @JsonProperty("itemId")
     private String itemId;

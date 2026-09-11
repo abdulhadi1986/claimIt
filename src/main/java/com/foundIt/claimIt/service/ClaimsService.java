@@ -3,10 +3,12 @@ package com.foundIt.claimIt.service;
 import com.foundIt.claimIt.domain.entity.ClaimEntity;
 import com.foundIt.claimIt.domain.entity.ItemEntity;
 import com.foundIt.claimIt.domain.entity.UserEntity;
+import com.foundIt.claimIt.domain.model.Claim;
 import com.foundIt.claimIt.exception.AuthenticationException;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
 import com.foundIt.claimIt.local.domain.LocalUser;
 import com.foundIt.claimIt.local.user.MockUserService;
+import com.foundIt.claimIt.mapper.DomainMapper;
 import com.foundIt.claimIt.repository.ClaimRepository;
 import com.foundIt.claimIt.repository.ItemRepository;
 import com.foundIt.claimIt.repository.UserRepository;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -45,6 +48,12 @@ public class ClaimsService {
         }
 
         return saveClaimToDB(qty, itemEntity, userData);
+    }
+
+    public List<Claim> getSubmittedClaims() {
+        return claimRepository.findAll().stream()
+                .map(DomainMapper.mapper()::mapToClaim)
+                .toList();
     }
 
     private Long saveClaimToDB(Long qty, ItemEntity itemEntity, LocalUser userData) {

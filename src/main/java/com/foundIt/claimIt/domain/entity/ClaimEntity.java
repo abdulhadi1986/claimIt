@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "claims")
 @Getter
@@ -21,5 +25,15 @@ public class ClaimEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity userEntity;
 
-    private Long quantity = 1L;
+    @Column(name = "quantity")
+    private Long quantity;
+
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        this.createdAt = now;
+    }
 }
