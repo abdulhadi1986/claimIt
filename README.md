@@ -35,6 +35,9 @@ All users
 - Spring Boot 4.*
 - PostgreSQL Database
 
+### Swagger Api Specifications :
+    http://localhost:8080/swagger-ui/index.html
+
 ### Local Development
 #### To run the application locally:
 1. Run the class: src/main/java/com/foundIt/claimIt/local/db/PostgresLauncher.java
@@ -49,7 +52,6 @@ There are services that authenticate user and issue JWT token.
 #### Local User Data (will be replaced by external service on production)
 in the package src/main/java/com/foundIt/claimIt/local**
 There are services that manage user data. in our service we only need userId and userName
-
 
 ### Local Testing
 run the application locally (Application port 8080 , database port 5432)

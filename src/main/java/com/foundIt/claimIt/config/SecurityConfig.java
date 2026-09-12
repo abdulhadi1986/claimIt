@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/login").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers("/claimit/items/lost-and-found-items").permitAll()
                                 .requestMatchers("/claimit/claims/submitted-claims").hasRole("ADMIN")
                                 .requestMatchers("/claimit/items-mgt/items-uploads").hasRole("ADMIN")
