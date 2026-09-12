@@ -1,0 +1,217 @@
+{
+  "info": {
+    "_postman_id": "253c93dc-ad3b-4877-a458-a265a55a1c5b",
+    "name": "ClaimIT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "5507025"
+  },
+  "item": [
+    {
+      "name": "Upload items",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "uuid": "f1687156-7cc0-4e83-b8eb-49a19ee9a941",
+              "src": "/Users/Abdulhadi.Abulzahab/Downloads/invalid.docx"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8080/management/found-items-uploads",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "management",
+            "found-items-uploads"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login Admin",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "userName",
+              "value": "role_admin1@claimit.com",
+              "type": "text",
+              "uuid": "eda16b37-33fc-49d3-a65d-2376a063f6bf"
+            },
+            {
+              "key": "password",
+              "value": "role_admin1123",
+              "type": "text",
+              "uuid": "79c64186-f9c6-4880-afa8-f5bfca4446af"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8080/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login User",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "userName",
+              "value": "role_user1@claimit.com",
+              "type": "text",
+              "uuid": "eda16b37-33fc-49d3-a65d-2376a063f6bf"
+            },
+            {
+              "key": "password",
+              "value": "role_user1123",
+              "type": "text",
+              "uuid": "79c64186-f9c6-4880-afa8-f5bfca4446af"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8080/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get claims",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{supabase_service_role_api_key_176y}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/claimit/claims/submitted-claims",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "claimit",
+            "claims",
+            "submitted-claims"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit claim",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"itemId\": 146,\n    \"quantity\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8080/claimit/claims/claim-submissions",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "claimit",
+            "claims",
+            "claim-submissions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get items",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:8080/claimit/items/lost-and-found-items",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "claimit",
+            "items",
+            "lost-and-found-items"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "supabase_service_role_api_key_176y",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_16or",
+      "secret": true
+    }
+  ]
+}

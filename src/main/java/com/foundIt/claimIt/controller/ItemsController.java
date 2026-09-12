@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,8 +36,9 @@ public class ItemsController {
 
     @Operation(
             summary = "Upload lost-and-found items file",
-            description = "Uploads a text file that contains records for item descriptions, quantity, and location."
+            description = "Uploads a text file that contains records for item descriptions, quantity, and location. Requires a Bearer token in the Authorization header with role ADMIN."
     )
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "File accepted and processed successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -43,6 +46,8 @@ public class ItemsController {
             @ApiResponse(responseCode = "400", description = "Invalid uploaded file", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/claimit/items-mgt/items-uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FileUploadResponse> uploadFile(
             @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,

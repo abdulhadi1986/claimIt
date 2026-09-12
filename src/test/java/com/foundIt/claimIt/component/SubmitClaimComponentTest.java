@@ -6,6 +6,7 @@ import com.foundIt.claimIt.domain.entity.UserEntity;
 import com.foundIt.claimIt.repository.ClaimRepository;
 import com.foundIt.claimIt.repository.ItemRepository;
 import com.foundIt.claimIt.repository.UserRepository;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,9 +36,34 @@ public class SubmitClaimComponentTest {
     }
 
     @Test
+    @DisplayName("CT: successful response when submit claim for item")
+    void submitClaim_success() {
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setName("Laptop");
+        itemEntity.setPlace("Train Station");
+        itemEntity.setQuantity(1L);
+        var savedId = itemRepository.save(itemEntity).getId();
+        String requestBody = String.format("""
+                {
+                "itemId": "%s",
+                "quantity": 1
+                }""", savedId);
+
+        given().body(requestBody)
+                .header("Authorization", "Bearer " + getUserToken("user"))
+                .header("content-type", "application/json")
+                .expect()
+                .statusCode(202)
+                .when()
+                .post("http://localhost:8080/claimit/claims/claim-submissions")
+                .then();
+    }
+
+    @Test
     @DisplayName("CT: error response when submit claim request is null")
     void submitClaim_invalid_request_null() {
         given()
+                .header("Authorization", "Bearer " + getUserToken("user"))
                 .header("content-type", "application/json")
                 .expect()
                 .statusCode(500)
@@ -47,14 +73,52 @@ public class SubmitClaimComponentTest {
     }
 
     @Test
+    @DisplayName("CT: unauthorized error response when token header is missing")
+    void submitClaim_unauthorized() {
+        String requestBody = String.format("""
+                {
+                "itemId": "%s",
+                "quantity": 1
+                }""", 1);
+
+        given().body(requestBody)
+                .header("content-type", "application/json")
+                .expect()
+                .statusCode(403)
+                .when()
+                .post("http://localhost:8080/claimit/claims/claim-submissions")
+                .then();
+    }
+
+    @Test
+    @DisplayName("CT: unauthorized error response when token role is admin")
+    void submitClaim_unauthorized_admin() {
+        String requestBody = String.format("""
+                {
+                "itemId": "%s",
+                "quantity": 1
+                }""", 1);
+
+        given().body(requestBody)
+                .header("Authorization", "Bearer " + getUserToken("admin"))
+                .header("content-type", "application/json")
+                .expect()
+                .statusCode(403)
+                .when()
+                .post("http://localhost:8080/claimit/claims/claim-submissions")
+                .then();
+    }
+
+    @Test
     @DisplayName("CT: error response when submit claim request missing quantity")
-    void submitClaim_invalid_request_missingItme() {
+    void submitClaim_invalid_request_missingItem() {
         String requestBody = String.format("""
                 {
                 "itemId": "%s"
                 }""", 1);
 
         given().body(requestBody)
+                .header("Authorization", "Bearer " + getUserToken("user"))
                 .header("content-type", "application/json")
                 .expect()
                 .statusCode(400)
@@ -72,32 +136,10 @@ public class SubmitClaimComponentTest {
                 }""";
 
         given().body(requestBody)
+                .header("Authorization", "Bearer " + getUserToken("user"))
                 .header("content-type", "application/json")
                 .expect()
                 .statusCode(400)
-                .when()
-                .post("http://localhost:8080/claimit/claims/claim-submissions")
-                .then();
-    }
-
-    @Test
-    @DisplayName("CT: successful response when submit claim for item")
-    void submitClaim_success() {
-        ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setName("Laptop");
-        itemEntity.setPlace("Train Station");
-        itemEntity.setQuantity(1L);
-        var savedId = itemRepository.save(itemEntity).getId();
-        String requestBody = String.format("""
-                {
-                "itemId": "%s",
-                "quantity": 1
-                }""", savedId);
-
-        given().body(requestBody)
-                .header("content-type", "application/json")
-                .expect()
-                .statusCode(202)
                 .when()
                 .post("http://localhost:8080/claimit/claims/claim-submissions")
                 .then();
@@ -113,6 +155,7 @@ public class SubmitClaimComponentTest {
                 }""", 100);
 
         given().body(requestBody)
+                .header("Authorization", "Bearer " + getUserToken("user"))
                 .header("content-type", "application/json")
                 .expect()
                 .statusCode(400)
@@ -136,6 +179,7 @@ public class SubmitClaimComponentTest {
                 }""", savedId);
 
         given().body(requestBody)
+                .header("Authorization", "Bearer " + getUserToken("user"))
                 .header("content-type", "application/json")
                 .expect()
                 .statusCode(400)
@@ -153,7 +197,8 @@ public class SubmitClaimComponentTest {
         var userEntity2 = userRepository.save(getUserEntity("102", "userName102"));
         claimRepository.save(getClaimEntity(1L, userEntity2, itemEntity));
 
-        given().header("content-type", "application/json")
+        given().header("Authorization", "Bearer " + getUserToken("admin"))
+                .header("content-type", "application/json")
                 .expect()
                 .statusCode(200)
                 .when()
@@ -196,5 +241,16 @@ public class SubmitClaimComponentTest {
         itemEntity.setQuantity(quantity);
         itemEntity.setPlace("Train Station");
         return itemEntity;
+    }
+
+    private String getUserToken(String role) {
+        return given()
+                .multiPart("userName", String.format("role_%s1@claimit.com", role))
+                .multiPart("password", String.format("role_%s1123", role))
+                .post("http://localhost:8080/login")
+                .then()
+                .contentType(ContentType.TEXT)
+                .extract()
+                .asString();
     }
 }

@@ -6,8 +6,8 @@ import com.foundIt.claimIt.domain.entity.UserEntity;
 import com.foundIt.claimIt.domain.model.Claim;
 import com.foundIt.claimIt.exception.AuthenticationException;
 import com.foundIt.claimIt.exception.InvalidUserInputException;
-import com.foundIt.claimIt.local.domain.LocalUser;
 import com.foundIt.claimIt.local.user.MockUserService;
+import com.foundIt.claimIt.local.user.UserAuthEntity;
 import com.foundIt.claimIt.repository.ClaimRepository;
 import com.foundIt.claimIt.repository.ItemRepository;
 import com.foundIt.claimIt.repository.UserRepository;
@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,9 +56,10 @@ class ClaimsServiceTest {
     @Test
     @DisplayName("UT: successful when register claim")
     void processClaimRequest() {
-        LocalUser localUser = LocalUser.builder().userId(UUID.randomUUID().toString()).userName("user1@test.com").build();
-        when(userService.getUserData(anyString())).thenReturn(
-                Optional.of(localUser));
+        UserAuthEntity userAuthEntity = new UserAuthEntity();
+        userAuthEntity.setId("user-id");
+        userAuthEntity.setUserName("user-name");
+        when(userService.getUserData()).thenReturn(Optional.of(userAuthEntity));
         ItemEntity itemEntity = getItemEntity(1986L, 2L);
 
         when(itemRepository.findById(1986L)).thenReturn(Optional.of(itemEntity));
@@ -71,8 +71,8 @@ class ClaimsServiceTest {
         verify(claimRepository).save(claimEntityArgumentCaptor.capture());
 
         UserEntity expectedUserEntity = new UserEntity();
-        expectedUserEntity.setId(localUser.getUserId());
-        expectedUserEntity.setUserName(localUser.getUserName());
+        expectedUserEntity.setId(userAuthEntity.getId());
+        expectedUserEntity.setUserName(userAuthEntity.getUserName());
 
         var actualClaimEntity = claimEntityArgumentCaptor.getValue();
         assertThat(actualClaimEntity.getUserEntity().getId()).isEqualTo(expectedUserEntity.getId());
@@ -88,8 +88,7 @@ class ClaimsServiceTest {
     @Test
     @DisplayName("UT: error user not found when register claim")
     void processClaimRequest_userNotFoundError() {
-        when(userService.getUserData(anyString())).thenReturn(Optional.empty());
-
+        when(userService.getUserData()).thenReturn(Optional.empty());
         assertThrows(AuthenticationException.class, () ->claimsService.processClaimRequest("1986", 2L));
         verifyNoInteractions(itemRepository);
         verifyNoInteractions(userRepository);
@@ -99,9 +98,11 @@ class ClaimsServiceTest {
     @Test
     @DisplayName("UT: error item not found when register claim")
     void processClaimRequest_itemNotFoundError() {
-        LocalUser localUser = LocalUser.builder().userId(UUID.randomUUID().toString()).userName("user1@test.com").build();
-        when(userService.getUserData(anyString())).thenReturn(
-                Optional.of(localUser));
+        UserAuthEntity userAuthEntity = new UserAuthEntity();
+        userAuthEntity.setId("user-id");
+        userAuthEntity.setUserName("user-name");
+        when(userService.getUserData()).thenReturn(Optional.of(userAuthEntity));
+
         when(itemRepository.findById(1986L)).thenReturn(Optional.empty());
 
         assertThrows(InvalidUserInputException.class, () ->claimsService.processClaimRequest("1986", 2L));
@@ -112,9 +113,10 @@ class ClaimsServiceTest {
     @Test
     @DisplayName("UT: error invalid qty when register claim and claimed qty is more than the registered record")
     void processClaimRequest_qtyInputError() {
-        LocalUser localUser = LocalUser.builder().userId(UUID.randomUUID().toString()).userName("user1@test.com").build();
-        when(userService.getUserData(anyString())).thenReturn(
-                Optional.of(localUser));
+        UserAuthEntity userAuthEntity = new UserAuthEntity();
+        userAuthEntity.setId("user-id");
+        userAuthEntity.setUserName("user-name");
+        when(userService.getUserData()).thenReturn(Optional.of(userAuthEntity));
         ItemEntity itemEntity = getItemEntity(1986L, 1L);
 
         when(itemRepository.findById(1986L)).thenReturn(Optional.of(itemEntity));
